@@ -1,19 +1,19 @@
 from datetime import datetime
 import os
-from usage_stats import UsageStats
 from typing import Dict
 from abc import abstractmethod
 
 class AudioFile:
     """ Represents an abstract AudioFile
 
-    Name: Roy Ortega
+    Name: Roy Ortega, Nathan Broyles, Adrian Chan
     Set: 2B
-    Date: January 22, 2020
+    Date: April 14, 2020
     """
 
+    _DATE_FORMAT = "%Y-%m-%d"
 
-    def __init__(self, title: str, artist: str, runtime: str, path_name: str):
+    def __init__(self, title: str, artist: str, runtime: str, path_name: str, date_added: datetime):
         """Creates an object instance of the audio_file class"""
         self._title = title
         self._artist = artist
@@ -23,10 +23,16 @@ class AudioFile:
         self._file_path = None
         self._file_name = None
         self.__set_file_info(path_name)
-        self._usage = UsageStats(datetime.now())
         self.__validate_info(title, artist, runtime, path_name)
         self.__validate_location()
         self.__validate_class(self)
+        if self.__valid_datetime(date_added):
+            self._date_added = date_added
+        else:
+            raise ValueError("date_added must be a datetime object")
+
+        self._play_count = 0
+        self._last_played = None
 
 
     @staticmethod
@@ -55,18 +61,15 @@ class AudioFile:
         """Gets the artist for the specific song instance"""
         return self._artist
 
-
-    @property
-    def user_rating(self) -> int:
-        """Returns the current user rating for the audio_file instance"""
-        return self._user_rating
-
-
     @property
     def runtime(self) -> str:
         """Returns the runtime for the audio instance"""
         return self._runtime
 
+    @property
+    def user_rating(self) -> int:
+        """Returns the current user rating for the audio_file instance"""
+        return self._user_rating
 
     @user_rating.setter
     def user_rating(self, rating: int):
@@ -82,9 +85,9 @@ class AudioFile:
 
     def display_play_count(self):
         """Returns a formatted string that shows the audio_file name and times played"""
-        play_string = "{} has been played {} time".format(self._title, self._usage.play_count)
+        play_string = "{} has been played {} time".format(self._title, self.play_count)
 
-        if self._usage.play_count > 1 or self._usage.play_count == 0:
+        if self.play_count > 1 or self.play_count == 0:
             play_string += 's'
 
         print(play_string)
@@ -121,12 +124,13 @@ class AudioFile:
 
     def update_usage_stats(self):
         """Updates the usage stats for this audio_file instance"""
-        self._usage.increment_usage_stats()
+        self.increment_usage_stats()
 
 
-    def get_usage_stats(self) -> UsageStats:
-        """Returns usage stats for the audio_file instance"""
-        return self._usage
+    """ Was this ever used??? """
+    # def get_usage_stats(self) -> UsageStats:
+    #     """Returns usage stats for the audio_file instance"""
+    #     return self._usage
 
     def get_location(self) -> str:
         """Gets file path of audio_file"""
@@ -134,6 +138,44 @@ class AudioFile:
             return self._path_name
         else:
             raise ValueError("Path does not exist")
+
+
+    """Code retrieved from usage_stats.py"""
+
+    @property
+    def date_added(self):
+        """ return the date the song or playlist was added to the library """
+        return self._date_added.strftime(AudioFile._DATE_FORMAT)
+
+    @property
+    def last_played(self):
+        """ return the date the song or playlist was last played """
+        if self._last_played is None:
+            return None
+        else:
+            return self._last_played.strftime(AudioFile._DATE_FORMAT)
+
+
+    @property
+    def play_count(self):
+        """ return the number of times the song or playlist has been played """
+        return self._play_count
+
+
+    def increment_usage_stats(self):
+        """ update the play count and last played time when a song is played """
+        self._play_count += 1
+        self._last_played = datetime.now()
+
+
+    @classmethod
+    def __valid_datetime(cls, date):
+        """ private method to validate the date is datetime object """
+        if type(date) is not datetime:
+            return False
+        else:
+            return True
+
 
     @abstractmethod
     def meta_data(self) -> Dict:
