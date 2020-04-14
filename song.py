@@ -11,9 +11,10 @@ class Song(AudioFile):
     Date: January 31, 2020
     """
 
-    def __init__(self, title: str, artist: str, runtime: str, path_name: str, album: str, genre: str = None):
+    def __init__(self, title: str, artist: str, runtime: str, path_name: str, album: str = None, genre: str = None):
         """Creates an object instance of the song subclass"""
-        super().__init__(title, artist, runtime, path_name, datetime.now())
+        super().__init__(title, artist, runtime, path_name)
+        self.song_id = None # Added for the song_manager.py
         self._album = album
         self._genre = genre
         self.__validate_song(album, genre)
@@ -21,8 +22,8 @@ class Song(AudioFile):
     @staticmethod
     def __validate_song(album, genre):
         """Validates the song specific arguments"""
-        if type(album) != str:
-            raise ValueError('Album must be a string')
+        if album is not None and (type(album) != str):
+            raise ValueError('Album must either not be included or a string')
         elif genre is not None and (type(genre) != str):
             raise ValueError('Genre must either not be included or a string')
         else:
