@@ -1,6 +1,6 @@
 from typing import Dict, List
 from audio_file import AudioFile
-from usage_stats import UsageStats
+from datetime import datetime
 
 class Song(AudioFile):
     """ Represents an abstract song, this is a subclass of the
@@ -13,11 +13,10 @@ class Song(AudioFile):
 
     def __init__(self, title: str, artist: str, runtime: str, path_name: str, album: str, genre: str = None):
         """Creates an object instance of the song subclass"""
-        super().__init__(title, artist, runtime, path_name)
+        super().__init__(title, artist, runtime, path_name, datetime.now())
         self._album = album
         self._genre = genre
         self.__validate_song(album, genre)
-
 
     @staticmethod
     def __validate_song(album, genre):
@@ -32,8 +31,8 @@ class Song(AudioFile):
     def get_description(self) -> str:
         """Returns a string that includes the relevant song information"""
         song_info = "{} by {} from the album {} added on {}. Runtime is {}. Last played on {}."\
-            .format(self._title, self._artist, self._album, self.get_usage_stats().date_added,
-                    self._runtime, self.get_usage_stats().last_played)
+            .format(self._title, self._artist, self._album, self.date_added,
+                    self._runtime, self.last_played)
 
         if self._genre is not None:
             genre_string = ''
@@ -52,8 +51,8 @@ class Song(AudioFile):
         """Creates meta data for this specific song instance in the form of a dictionary"""
         self._song_dict = {}
         self._song_dict.update([('title', self._title), ('artist', self._artist), ('album', self._album),
-                                ('date_added', self.get_usage_stats().date_added), ('runtime', self._runtime),
-                                ('last_played', self.get_usage_stats().last_played), ('rating', self._user_rating),
+                                ('date_added', self.date_added), ('runtime', self._runtime),
+                                ('last_played', self.last_played), ('rating', self._user_rating),
                                 ('genre', self._genre)])
         return self._song_dict
 
