@@ -13,7 +13,7 @@ class AudioFile:
 
     _DATE_FORMAT = "%Y-%m-%d"
 
-    def __init__(self, title: str, artist: str, runtime: str, path_name: str, date_added: datetime):
+    def __init__(self, title: str, artist: str, runtime: str, path_name: str):
         """Creates an object instance of the audio_file class"""
         self._title = title
         self._artist = artist
@@ -22,17 +22,14 @@ class AudioFile:
         self._path_name = path_name
         self._file_path = None
         self._file_name = None
+        self._date_added = datetime.now()
+        self._play_count = 0
+        self._last_played = None
         self.__set_file_info(path_name)
         self.__validate_info(title, artist, runtime, path_name)
         self.__validate_location()
         self.__validate_class(self)
-        if self.__valid_datetime(date_added):
-            self._date_added = date_added
-        else:
-            raise ValueError("date_added must be a datetime object")
 
-        self._play_count = 0
-        self._last_played = None
 
 
     @staticmethod
@@ -127,11 +124,6 @@ class AudioFile:
         self.increment_usage_stats()
 
 
-    """ Was this ever used??? """
-    # def get_usage_stats(self) -> UsageStats:
-    #     """Returns usage stats for the audio_file instance"""
-    #     return self._usage
-
     def get_location(self) -> str:
         """Gets file path of audio_file"""
         if os.path.exists(self._path_name):
@@ -176,6 +168,7 @@ class AudioFile:
         else:
             return True
 
+    """ End of usage stats code"""
 
     @abstractmethod
     def meta_data(self) -> Dict:

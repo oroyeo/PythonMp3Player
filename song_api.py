@@ -1,24 +1,24 @@
 from flask import Flask, request
-from student_manager import StudentManager
-from student import Student
+from song_manager import SongManager
+from song import Song
 import json
 import random
 
 app = Flask(__name__)
 
-student_mgr = StudentManager('student_db.sqlite')
+song_mgr = SongManager('song_db.sqlite')
 
 
-@app.route('/student', methods=['POST'])
-def add_student():
-    """ Add a student to the database    """
+@app.route('/song', methods=['POST'])
+def add_song():
+    """ Add a song to the database    """
     content = request.json
 
     try:
-        student = Student(content['student_id'],
+        song = Song(content['song_id'],
                           content['first_name'],
                           content['last_name'])
-        student_mgr.add_student(student)
+        song_mgr.add_song(song)
 
         response = app.response_class(
                 status=200
@@ -31,17 +31,17 @@ def add_student():
     return response
 
 
-@app.route('/student/<string:student_id>', methods=['GET'])
-def get_student(student_id):
-    """ Get a student from the database """
+@app.route('/song/<string:song_id>', methods=['GET'])
+def get_song(song_id):
+    """ Get a song from the database """
     try:
-        student = student_mgr.get_student(student_id)
-        if student is None:
-            raise ValueError(f"Student {student_id} does not exist")
+        song = song_mgr.get_song(song_id)
+        if song is None:
+            raise ValueError(f"Song {song_id} does not exist")
 
         response = app.response_class(
                 status=200,
-                response=json.dumps(student.to_dict()),
+                response=json.dumps(song.to_dict()),
                 mimetype='application/json'
         )
         return response
@@ -53,21 +53,21 @@ def get_student(student_id):
         return response
 
 
-@app.route('/student/random', methods=['GET'])
-def random_student():
-    """ Return a random student from the database """
+@app.route('/song/random', methods=['GET'])
+def random_song():
+    """ Return a random song from the database """
     try:
-        names = student_mgr.get_all_students()
+        names = song_mgr.get_all_songs()
 
         if len(names) > 0:
             idx = random.randint(0, len(names) - 1)
-            random_student = names[idx]
+            random_song = names[idx]
         else:
-            raise ValueError("No Students in DB")
+            raise ValueError("No Songs in DB")
 
         response = app.response_class(
                 status=200,
-                response=json.dumps(random_student.to_dict()),
+                response=json.dumps(random_song.to_dict()),
                 mimetype='application/json'
         )
         return response
@@ -79,11 +79,11 @@ def random_student():
         return response
 
 
-@app.route('/student/<string:student_name>', methods=['DELETE'])
-def delete_student(student_name):
-    """ Delete a student from the DB   """
+@app.route('/song/<string:song_name>', methods=['DELETE'])
+def delete_song(song_name):
+    """ Delete a song from the DB   """
     try:
-        student_mgr.delete_student(student_name)
+        song_mgr.delete_song(song_name)
 
         response = app.response_class(
                 status=200
@@ -96,10 +96,10 @@ def delete_student(student_name):
     return response
 
 
-@app.route('/student/names', methods=['GET'])
+@app.route('/song/names', methods=['GET'])
 def get_all_names():
-    """ Return a list of all student names    """
-    names = student_mgr.get_all_students()
+    """ Return a list of all song names    """
+    names = song_mgr.get_all_songs()
 
     response = app.response_class(
             status=200,
@@ -110,16 +110,16 @@ def get_all_names():
     return response
 
 
-@app.route('/student/<string:student_id>', methods=['PUT'])
-def update_student(student_id):
-    """ Update the student information  """
+@app.route('/song/<string:song_id>', methods=['PUT'])
+def update_song(song_id):
+    """ Update the song information  """
     content = request.json
 
     try:
-        student = student_mgr.get_student(student_id)
-        student.first_name = content['first_name']
-        student.last_name = content['last_name']
-        student_mgr.update_student(student)
+        song = song_mgr.get_song(song_id)
+        song.first_name = content['first_name']
+        song.last_name = content['last_name']
+        song_mgr.update_song(song)
         response = app.response_class(
                 status=200
         )
@@ -131,11 +131,11 @@ def update_student(student_id):
 
     return response
 
-@app.route('/student/all', methods=['DELETE'])
-def delete_all_students():
-     """ Delete a student from the DB """
+@app.route('/song/all', methods=['DELETE'])
+def delete_all_songs():
+     """ Delete a song from the DB """
      try:
-         student_mgr.delete_all_students()
+         song_mgr.delete_all_songs()
 
          response = app.response_class(
              status=200
