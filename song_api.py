@@ -120,9 +120,12 @@ def update_song(song_id):
 
     try:
         song = song_mgr.get_song(song_id)
-        song.rating = content['rating']
-        song.album = content['album']
-        song.genre = content['genre']
+        if 'rating' in content:
+            song.rating = content['rating']
+        if 'album' in content:
+            song.album = content['album']
+        if 'genre' in content:
+            song.genre = content['genre']
         song_mgr.update_song(song)
         response = app.response_class(
                 status=200
