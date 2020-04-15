@@ -2,8 +2,10 @@ from datetime import datetime
 import os
 from typing import Dict
 from abc import abstractmethod
+from base import Base
+from sqlalchemy import Column, Text, Integer
 
-class AudioFile:
+class AudioFile(Base):
     """ Represents an abstract AudioFile
 
     Name: Roy Ortega, Nathan Broyles, Adrian Chan
@@ -12,6 +14,18 @@ class AudioFile:
     """
 
     _DATE_FORMAT = "%Y-%m-%d"
+
+    __tablename__ = "song_tbl"
+    id = Column(Text, primary_key=True)
+    title = Column(Text, nullable=False)
+    artist = Column(Text, nullable=False)
+    runtime = Column(Text)
+    path_name = Column(Text, nullable=False)
+    file_path = Column(Text)
+    file_name = Column(Text)
+    date_added = Column(Text, nullable=False)
+    play_count = Column(Integer, nullable=False)
+    last_played = Column(Text)
 
     def __init__(self, title: str, artist: str, runtime: str, path_name: str):
         """Creates an object instance of the audio_file class"""
