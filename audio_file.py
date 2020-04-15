@@ -36,7 +36,7 @@ class AudioFile(Base):
         self.path_name = path_name
         self.file_path = None
         self.file_name = None
-        self.date_added = datetime.now()
+        self.date_added = datetime.now().strftime(AudioFile._DATE_FORMAT)
         self.play_count = 0
         self.last_played = None
         self.__set_file_info(path_name)
