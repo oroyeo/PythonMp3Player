@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 from base import Base
 
 from song import Song
-from song import Song
 
 
 class SongManager:
