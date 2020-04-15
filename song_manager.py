@@ -39,10 +39,10 @@ class SongManager:
 
         session.commit()
 
-        song_id = new_song.song_id
+        # song_id = new_song.song_id
         session.close()
 
-        return song_id
+        # return song_id
 
     def update_song(self, song):
         """ Update existing song to match song_upd """
