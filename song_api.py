@@ -15,9 +15,12 @@ def add_song():
     content = request.json
 
     try:
-        song = Song(content['song_id'],
-                          content['first_name'],
-                          content['last_name'])
+        song = Song(content['title'],
+                    content['artist'],
+                    content['runtime'],
+                    content['path_name'],
+                    content['album'],
+                    content['genre'])
         song_mgr.add_song(song)
 
         response = app.response_class(

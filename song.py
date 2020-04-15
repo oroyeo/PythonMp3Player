@@ -1,8 +1,9 @@
 from typing import Dict, List
 from audio_file import AudioFile
-from datetime import datetime
+from base import Base
+from sqlalchemy import Column, Text
 
-class Song(AudioFile):
+class Song(AudioFile, Base):
     """ Represents an abstract song, this is a subclass of the
         AudioFile class
 
@@ -10,6 +11,16 @@ class Song(AudioFile):
     Set: 2B
     Date: January 31, 2020
     """
+
+    """ ORM: map db columns to instance variables in this class """
+    __tablename__ = "song_tbl"
+    song_id = Column(Text, primary_key=True)
+    title = Column(Text, nullable=False)
+    artist = Column(Text, nullable=False)
+    runtime = Column(Text, nullable=False)
+    path_name = Column(Text, nullable=False)
+    album = Column(Text, nullable=True)
+    genre = Column(Text, nullable=True)
 
     def __init__(self, title: str, artist: str, runtime: str, path_name: str, album: str = None, genre: str = None):
         """Creates an object instance of the song subclass"""
