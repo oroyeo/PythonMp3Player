@@ -34,17 +34,17 @@ def add_song():
     return response
 
 
-@app.route('/song/<string:song_id>', methods=['GET'])
-def get_song(song_id):
+@app.route('/song/<string:id>', methods=['GET'])
+def get_song(id):
     """ Get a song from the database """
     try:
-        song = song_mgr.get_song(song_id)
+        song = song_mgr.get_song(id)
         if song is None:
-            raise ValueError(f"Song {song_id} does not exist")
+            raise ValueError(f"Song {id} does not exist")
 
         response = app.response_class(
                 status=200,
-                response=json.dumps(song.to_dict()),
+                response=json.dumps(song.meta_data()),
                 mimetype='application/json'
         )
         return response
@@ -120,8 +120,9 @@ def update_song(song_id):
 
     try:
         song = song_mgr.get_song(song_id)
-        song.first_name = content['first_name']
-        song.last_name = content['last_name']
+        song.rating = content['rating']
+        song.album = content['album']
+        song.genre = content['genre']
         song_mgr.update_song(song)
         response = app.response_class(
                 status=200

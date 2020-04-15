@@ -45,8 +45,8 @@ class Song(AudioFile):
             genre_string = genre_string.strip(', ')
             song_info += ' The song fits in the following genre(s) {}.'.format(genre_string)
 
-        if self.user_rating is not None:
-            song_info += " User rating is {}/5".format(self.user_rating)
+        if self.rating is not None:
+            song_info += " User rating is {}/5".format(self.rating)
 
         return song_info
 
@@ -56,7 +56,16 @@ class Song(AudioFile):
         self._song_dict = {}
         self._song_dict.update([('title', self.title), ('artist', self.artist), ('album', self.album),
                                 ('date_added', self.date_added), ('runtime', self.runtime),
-                                ('last_played', self.last_played), ('rating', self.user_rating),
+                                ('last_played', self.last_played), ('rating', self.rating),
                                 ('genre', self.genre)])
         return self._song_dict
 
+    def update(self, new_data: object):
+        """ Copy all changes fields into the actual object (self). """
+        if not isinstance(new_data, Song):
+            raise TypeError("new_data must be a Song object")
+        if new_data.id != self.id:
+            raise ValueError("Song ID cannot be changed")
+        self.rating = new_data.rating
+        self.genre = new_data.genre
+        self.album = new_data.album
