@@ -26,13 +26,14 @@ class AudioFile(Base):
     date_added = Column(Text, nullable=False)
     play_count = Column(Integer, nullable=False)
     last_played = Column(Text)
+    rating = Column(Integer)
 
     def __init__(self, title: str, artist: str, runtime: str, path_name: str):
         """Creates an object instance of the audio_file class"""
         self.title = title
         self.artist = artist
         self.runtime = runtime
-        self.user_rating = None
+        self.rating = None
         self.path_name = path_name
         self.file_path = None
         self.file_name = None
@@ -78,20 +79,20 @@ class AudioFile(Base):
         return self.runtime
 
     @property
-    def get_user_rating(self) -> int:
+    def get_rating(self) -> int:
         """Returns the current user rating for the audio_file instance"""
-        return self.user_rating
+        return self.rating
 
-    @get_user_rating.setter
-    def get_user_rating(self, rating: int):
+    @get_rating.setter
+    def get_rating(self, rating: int):
         """Sets the audio_file instance's rating to the entered argument"""
         if type(rating) == int:
-            self.user_rating = rating
+            self.rating = rating
         if type(rating) != int:
             raise ValueError
         if rating < 0 or rating > 5:
             print('Rating is out of 5. Please enter an integer from 0 to 5.')
-            self.user_rating = None
+            self.rating = None
 
 
     def display_play_count(self):

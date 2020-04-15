@@ -52,24 +52,24 @@ class SongManager:
         session = self._db_session()
 
         existing_song = session.query(Song).filter(
-                Song.song_id == song.song_id).first()
+                Song.id == song.id).first()
         if existing_song is None:
-            raise ValueError(f"Song {song.song_id} does not exist")
+            raise ValueError(f"Song {song.id} does not exist")
 
         existing_song.update(song)
 
         session.commit()
         session.close()
 
-    def get_song(self, song_id):
+    def get_song(self, id):
         """ Return song object matching ID"""
-        if song_id is None or type(song_id) != str:
+        if id is None or type(id) != str:
             raise ValueError("Invalid Song ID")
 
         session = self._db_session()
 
         song = session.query(Song).filter(
-                Song.song_id == song_id).first()
+                Song.id == id).first()
 
         session.close()
 

@@ -12,7 +12,7 @@ db_session = sessionmaker(bind=engine)
 def main():
 
     song1 = Song('thank u, next', 'Ariana Grande', '3:02', r"C:\Users\royeo\Desktop\CIT Term 2\ACIT 2515 - Object Oriented Programming\Week 9 - Copy\Music\Ariana Grande - thank u next.mp3", 'thank u, next')
-    song1.user_rating = 6
+    song1.rating = 6
     song1.increment_usage_stats()
     print(song1.get_description())
 
