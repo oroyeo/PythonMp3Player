@@ -67,8 +67,17 @@ class Song(AudioFile):
         if new_data.id != self.id:
             raise ValueError("Song ID cannot be changed")
         if new_data.rating != None:
-            self.rating = new_data.rating
+            if new_data.rating < 6 and new_data.rating > -1:
+                self.rating = new_data.rating
+            else:
+                raise ValueError("Rating be an integer between 0 and 5")
         if new_data.genre != None:
-            self.genre = new_data.genre
+            if type(new_data.genre) == str:
+                self.genre = new_data.genre
+            else:
+                raise ValueError("Genre must be a string")
         if new_data.album != None:
-            self.album = new_data.album
+            if type(new_data.album) == str:
+                self.album = new_data.album
+            else:
+                raise ValueError("Album must be a string")
