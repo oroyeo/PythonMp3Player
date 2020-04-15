@@ -34,6 +34,10 @@ class SongManager:
         if new_song is None or not isinstance(new_song, Song):
             raise ValueError("Invalid Song Object")
 
+        for song in self.get_all_songs():
+            if new_song.title == song.title and new_song.artist == song.artist:
+                raise ValueError("Song already exists in the database")
+
         session = self._db_session()
         session.add(new_song)
 
@@ -75,20 +79,19 @@ class SongManager:
 
         return song
 
-    def delete_song(self, song_name):
+    def delete_song(self, id):
         """ Delete a song from the database """
-        if song_name is None or type(song_name) != str:
-            raise ValueError("Invalid Song name")
+        if id is None or type(id) != str:
+            raise ValueError("Invalid Song id")
 
-        song_split = song_name.split()
-        title = song_split[0]
-        artist = song_split[1]
+        # song_split = song_name.split()
+        # title = song_split[0]
+        # artist = song_split[1]
 
         session = self._db_session()
 
         song = session.query(Song).filter(
-            (Song.title == title)
-            and (Song.artist == artist)).first()
+            (Song.id == id)).first()
         if song is None:
             session.close()
             raise ValueError("Song does not exist")
