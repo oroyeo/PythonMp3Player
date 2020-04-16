@@ -6,6 +6,8 @@ from tkinter import messagebox
 from song import Song
 from classlist_window import ClasslistWindow
 from add_song_window import AddSongWindow
+import eyed3
+import os
 
 
 class MainAppController(tk.Frame):
@@ -44,30 +46,31 @@ class MainAppController(tk.Frame):
 
     def add_callback(self):
         """ Add a new student name to the file. """
-        form_data = self._add_student.get_form_data()
+        form_data = self._add_song.get_form_data()
+        print(len(form_data))
+        song_data = self.load(form_data)
 
-
-
-        if len(form_data) != 3:
-            messagebox.showerror(title='Invalid name data',
-                                 message='Enter "id,first,last')
+        if len(form_data) != 1:
+            messagebox.showerror(title='Invalid url data',
+                                 message='Enter "Song URL')
             return
 
-        data = form_data
-
-        response = requests.post("http://localhost:5000/song", json=data)
+        response = requests.post("http://localhost:5000/song", json=song_data)
         if response.status_code == 200:
-            msg_str = f'{form_data["student_id"]} {form_data["first_name"]} {form_data["last_name"]}' \
+            msg_str = f'{song_data["title"]}, {song_data["artist"]}' \
                       f' added to the database'
-            messagebox.showinfo(title='Add Student', message=msg_str)
+            messagebox.showinfo(title='Add Song', message=msg_str)
 
-        response_names = requests.get("http://localhost:5000/student/names")
-        name_list = [f'{s["first_name"]} {s["last_name"]}' for s in response_names.json()]
-        self._class.set_names(name_list)
-        self._add_student._close_cb()
+        if response.status_code == 400:
+            msg_str = 'Song already exists'
+            messagebox.showinfo(title='Add Song', message=msg_str)
+        # response_names = requests.get("http://localhost:5000/student/names")
+        # name_list = [f'{s["first_name"]} {s["last_name"]}' for s in response_names.json()]
+        # self._class.set_names(name_list)
+        self._add_song._close_cb()
         return
 
-    """ Don't need this """
+    """ Don't need this? Unless we refactor it to make it open file on click """
     # def openfile(self):
     #     """ Load all the names from the file """
     #     selected_file = askopenfilename(initialdir='.')
@@ -114,7 +117,7 @@ class MainAppController(tk.Frame):
     def add_song_popup(self):
         """ Shows entry field popup"""
         self._add_win = tk.Toplevel()
-        self._add_student = AddSongWindow(self._add_win,
+        self._add_song = AddSongWindow(self._add_win,
                                              self._close_add_song_popup,
                                              self.add_callback)
 
@@ -140,6 +143,27 @@ class MainAppController(tk.Frame):
         response_names = requests.get("http://localhost:5000/student/names")
         name_list = [f'{s["first_name"]} {s["last_name"]}' for s in response_names.json()]
         self._class.set_names(name_list)
+
+    """ Use this to start the add song """
+    def load(self, song_url):
+        """ Loads a song by the url"""
+        split_path = os.path.split(song_url['path_name'])
+        mp3_path = split_path[0]
+        mp3_file = eyed3.load(song_url['path_name'])
+        runtime = mp3_file.info.time_secs
+        mins = int(runtime // 60)
+        secs = int(runtime % 60)
+        runtime = ('{}:{}'.format(mins, secs))
+
+        song_info = { "title": getattr(mp3_file.tag, 'title'),
+            "artist": getattr(mp3_file.tag, 'artist'),
+            "runtime": runtime,
+            "path_name": song_url['path_name'],
+            "album": getattr(mp3_file.tag, 'album'),
+            "genre": str(getattr(mp3_file.tag, 'genre'))
+                    }
+
+        return song_info
 
 
 
