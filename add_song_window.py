@@ -38,11 +38,8 @@ class AddSongWindow(tk.Frame):
     """" Reformat this to take the attributes from songs """
     def get_form_data(self):
         """ Return a dictionary of form field values for this form """
-        # song_data = {"student_id": self._new_id.get(),
-        #         "first_name": self._new_first_name.get(),
-        #         "last_name": self._new_last_name.get()
-        #                 }
-        #
-        # return song_data
+        song_data = {"path_name": self._url.get()}
+
+        return song_data
 
 
