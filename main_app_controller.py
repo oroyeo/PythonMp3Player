@@ -1,11 +1,11 @@
 import tkinter as tk
-from chooser_window import ChooserWindow
+from player_window import PlayerWindow
 from tkinter.filedialog import askopenfilename
 import requests
 from tkinter import messagebox
 from song import Song
 from classlist_window import ClasslistWindow
-from add_student_window import AddStudentWindow
+from add_song_window import AddSongWindow
 
 
 class MainAppController(tk.Frame):
@@ -15,17 +15,17 @@ class MainAppController(tk.Frame):
         """ Create the views """
         tk.Frame.__init__(self, parent)
         self._root_win = tk.Toplevel()
-        self._chooser = ChooserWindow(self._root_win, self)
+        self._player = PlayerWindow(self._root_win, self)
 
     # 6: define callback functions
     def clear_callback(self):
         """ Remove all students names from system. """
-        response = requests.delete("http://localhost:5000/student/all")
+        response = requests.delete("http://localhost:5000/song/all")
         if response.status_code == 200:
-            msg_str = f'All names removed from the database'
+            msg_str = f'All songs removed from the database'
             messagebox.showinfo(title='Delete All', message=msg_str)
         else:
-            messagebox.showerror(title='Delete All', message="Something wentwrong")
+            messagebox.showerror(title='Delete All', message="Something went wrong")
 
     def quit_callback(self):
         """ Exit the application. """
@@ -111,14 +111,14 @@ class MainAppController(tk.Frame):
         self._class_win.destroy()
 
 
-    def add_student_popup(self):
+    def add_song_popup(self):
         """ Shows entry field popup"""
         self._add_win = tk.Toplevel()
-        self._add_student = AddStudentWindow(self._add_win,
-                                             self._close_add_student_popup,
+        self._add_student = AddSongWindow(self._add_win,
+                                             self._close_add_song_popup,
                                              self.add_callback)
 
-    def _close_add_student_popup(self):
+    def _close_add_song_popup(self):
         """ Close Add popup"""
 
         self._add_win.destroy()
