@@ -78,12 +78,13 @@ class MainAppController(tk.Frame):
         song_listbox = self._player.song_listbox
         item = song_listbox.curselection()
         index = item[0]
-        id = item[1]
-        print(index, id)
+        song_info = song_listbox.get(index)
 
-        song_info = self._player.song_listbox.get(index)
+        # split = song_info.split(" - ")
+        # print(song_info)
+        # print(split)
 
-        response = requests.delete("http://localhost:5000/ong/" + id)
+        response = requests.delete("http://localhost:5000/song/" + song_info)
 
         if response.status_code == 200:
             msg_str = f'{song_info} deleted from the database'
@@ -94,7 +95,7 @@ class MainAppController(tk.Frame):
     def listbox_callback(self):
         """ Gets a list of all songs and """
         response_names = requests.get("http://localhost:5000/song/songs")
-        song_list = [f'{s["title"]} {s["artist"]}' for s in response_names.json()]
+        song_list = [f'{s["title"]} - {s["artist"]}' for s in response_names.json()]
         song_listbox = self._player.song_listbox
         song_listbox.delete(0, tk.END)
         for song in song_list:
