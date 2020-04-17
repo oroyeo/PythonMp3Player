@@ -31,7 +31,7 @@ class PlayerWindow(tk.Frame):
         mid_frame = tk.Frame(master=parent)
         mid_frame.grid(row=1, padx=40, pady=10)
 
-        bot_frame = tk.Frame(master=parent)
+        bot_frame = tk.Frame(master=parent, bg='gray58')
         bot_frame.grid(row=2, padx=30, pady=10)
 
         # Song label
@@ -55,34 +55,34 @@ class PlayerWindow(tk.Frame):
         self.song_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Buttons
-        tk.Button(bot_frame, text="Play", width=10, command=my_controller.play_callback)\
+        tk.Button(bot_frame, text="Play", width=10, bg='MediumPurple3', fg='white', command=my_controller.play_callback)\
                 .grid(row=0, column=0, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Pause", width=10, command=my_controller.pause_callback)\
+        tk.Button(bot_frame, text="Pause", width=10, bg='MediumPurple3', fg='white', command=my_controller.pause_callback)\
                 .grid(row=0, column=1, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Resume", width=10, command=my_controller.resume_callback)\
+        tk.Button(bot_frame, text="Resume", width=10, bg='MediumPurple3', fg='white', command=my_controller.resume_callback)\
                 .grid(row=0, column=2, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Stop", width=10, command=my_controller.stop_callback)\
+        tk.Button(bot_frame, text="Stop", width=10, bg='MediumPurple1', fg='white', command=my_controller.stop_callback)\
                 .grid(row=1, column=0, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Add", width=10, command=my_controller.add_song_popup)\
+        tk.Button(bot_frame, text="Add", width=10, bg='MediumPurple1', fg='white', command=my_controller.add_song_popup)\
                 .grid(row=1, column=1, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Delete", width=10, command=my_controller.delete_callback)\
+        tk.Button(bot_frame, text="Delete", width=10, bg='MediumPurple1', fg='white', command=my_controller.delete_callback)\
                 .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Update Song", width=10, command=my_controller.update_song_popup)\
+        tk.Button(bot_frame, text="Update Song", width=10, bg='thistle2', fg='black', command=my_controller.update_song_popup)\
                 .grid(row=2, column=0, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Song Info", width=10, command=my_controller.song_info_popup)\
+        tk.Button(bot_frame, text="Song Info", width=10, bg='thistle1', fg='black', command=my_controller.song_info_popup)\
                 .grid(row=3, column=0, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Queue", width=10, command=my_controller.add_queue_callback)\
+        tk.Button(bot_frame, text="Add to Queue", width=10, bg='thistle2', fg='black', command=my_controller.add_queue_callback)\
                 .grid(row=2, column=2, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="View Queue", width=10, command=my_controller.queue_window_popup)\
+        tk.Button(bot_frame, text="View Queue", width=10, bg='thistle1', fg='black', command=my_controller.queue_window_popup)\
                 .grid(row=3, column=2, sticky=tk.E, padx=20, pady=5)
 
 
