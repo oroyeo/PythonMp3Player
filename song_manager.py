@@ -65,15 +65,21 @@ class SongManager:
         session.commit()
         session.close()
 
-    def get_song(self, id):
+    def get_song(self, song_info):
         """ Return song object matching ID"""
-        if id is None or type(id) != str:
-            raise ValueError("Invalid Song ID")
+        if song_info is None or type(song_info) != str:
+            raise ValueError("Invalid Song info")
+
+        split = song_info.split(' - ')
+        title = split[0]
+        artist = split[1]
+        print(title)
+        print(artist)
 
         session = self._db_session()
 
         song = session.query(Song).filter(
-                Song.id == id).first()
+            (Song.title == title) and (Song.artist == artist)).first()
 
         session.close()
 

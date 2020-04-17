@@ -34,43 +34,18 @@ def add_song():
     return response
 
 
-@app.route('/song/<string:id>', methods=['GET'])
-def get_song(id):
+@app.route('/song/<string:song_info>', methods=['GET'])
+def get_song(song_info):
     """ Get a song from the database """
     try:
-        song = song_mgr.get_song(id)
+        print(song_info)
+        song = song_mgr.get_song(song_info)
         if song is None:
-            raise ValueError(f"Song {id} does not exist")
+            raise ValueError(f"Song does not exist")
 
         response = app.response_class(
                 status=200,
                 response=json.dumps(song.meta_data()),
-                mimetype='application/json'
-        )
-        return response
-    except ValueError as e:
-        response = app.response_class(
-                response=str(e),
-                status=404
-        )
-        return response
-
-
-@app.route('/song/random', methods=['GET'])
-def random_song():
-    """ Return a random song from the database """
-    try:
-        names = song_mgr.get_all_songs()
-
-        if len(names) > 0:
-            idx = random.randint(0, len(names) - 1)
-            random_song = names[idx]
-        else:
-            raise ValueError("No Songs in DB")
-
-        response = app.response_class(
-                status=200,
-                response=json.dumps(random_song.to_dict()),
                 mimetype='application/json'
         )
         return response

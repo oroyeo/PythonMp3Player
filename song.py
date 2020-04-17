@@ -56,6 +56,8 @@ class Song(AudioFile):
         self._song_dict = {}
         self._song_dict.update([('title', self.title), ('artist', self.artist), ('album', self.album),
                                 ('date_added', self.date_added), ('runtime', self.runtime),
+                                ('path_name', self.path_name), ('file_path', self.file_path),
+                                ('file_name', self.file_name),
                                 ('last_played', self.last_played), ('rating', self.rating),
                                 ('genre', self.genre)])
         return self._song_dict

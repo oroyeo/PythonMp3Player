@@ -21,6 +21,9 @@ class MainAppController(tk.Frame):
         self._player = PlayerWindow(self._root_win, self)
         self.listbox_callback()
 
+        self._vlc_instance = vlc.Instance()
+        self._media_player = self._vlc_instance.media_player_new()
+
     # 6: define callback functions
     def clear_callback(self):
         """ Remove all students names from system. """
@@ -38,7 +41,6 @@ class MainAppController(tk.Frame):
     def add_callback(self):
         """ Add a new student name to the file. """
         form_data = self._add_song.get_form_data()
-        print(len(form_data))
         song_data = self.load(form_data)
 
         if len(form_data) != 1:
@@ -80,10 +82,6 @@ class MainAppController(tk.Frame):
         index = item[0]
         song_info = song_listbox.get(index)
 
-        # split = song_info.split(" - ")
-        # print(song_info)
-        # print(split)
-
         response = requests.delete("http://localhost:5000/song/" + song_info)
 
         if response.status_code == 200:
@@ -103,7 +101,41 @@ class MainAppController(tk.Frame):
 
 
     def play_callback(self):
-        pass
+        """Play a song specified by number. """
+        song_listbox = self._player.song_listbox
+        item = song_listbox.curselection()
+        index = item[0]
+        song_info = song_listbox.get(index)
+
+        title = song_info[0]
+        if title is None:
+            messagebox.showinfo(title="Invalid Choice",
+                    message=f"Invalid song, please us the listbox to select a song from the"\
+                            f"listbox.")
+            return
+
+        response = requests.get("http://localhost:5000/song/" + song_info)
+
+        if self._media_player.get_state() == vlc.State.Playing:
+            self._media_player.stop()
+        media_file = response.json()['path_name']
+        media = self._vlc_instance.media_new_path(media_file)
+        self._media_player.set_media(media)
+        self._media_player.play()
+        self._current_title = title
+        print(f"Playing {title} from file {media_file}")
+
+    def pause_callback(self):
+        """ Pause the player """
+        if self._media_player.get_state() == vlc.State.Playing:
+            self._media_player.pause()
+        print(f"Player paused during playback of {self._current_title}")
+
+    def resume_callback(self):
+        """ Resume playing """
+        if self._media_player.get_state() == vlc.State.Paused:
+            self._media_player.pause()
+        print(f"Playback of {self._current_title} resumed")
 
     def load(self, song_url):
         """ Loads a song by the url"""
