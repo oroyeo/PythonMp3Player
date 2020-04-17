@@ -79,19 +79,19 @@ class SongManager:
 
         return song
 
-    def delete_song(self, id):
+    def delete_song(self, song_info):
         """ Delete a song from the database """
-        if id is None or type(id) != str:
+        if song_info is None or type(song_info) != str:
             raise ValueError("Invalid Song id")
 
-        # song_split = song_name.split()
-        # title = song_split[0]
-        # artist = song_split[1]
+        split = song_info.split(' - ')
+        title = split[0]
+        artist = split[1]
 
         session = self._db_session()
 
         song = session.query(Song).filter(
-            (Song.id == id)).first()
+            (Song.title == title) and (Song.artist == artist)).first()
         if song is None:
             session.close()
             raise ValueError("Song does not exist")

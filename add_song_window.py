@@ -22,7 +22,7 @@ class AddSongWindow(tk.Frame):
 
         tk.Label(self.mid_frame, text='Song URL:').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
 
-        self._url = tk.Entry(self.mid_frame, width=20)
+        self._url = tk.Entry(self.mid_frame, width=50)
         self._url.grid(row=0, column=1, sticky=tk.E)
 
         self.add_student_button = tk.Button(self.bot_frame, text="Save", width=10,

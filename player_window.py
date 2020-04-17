@@ -61,7 +61,7 @@ class PlayerWindow(tk.Frame):
         tk.Button(bot_frame, text="Add", width=10, command=my_controller.add_song_popup)\
                 .grid(row=1, column=0, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Delete", width=10, command=self.passer_function())\
+        tk.Button(bot_frame, text="Delete", width=10, command=my_controller.delete_callback)\
                 .grid(row=1, column=1, sticky=tk.E, padx=20, pady=5)
 
         tk.Button(bot_frame, text="Queue", width=10, command=self.passer_function())\

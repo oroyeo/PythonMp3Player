@@ -82,11 +82,12 @@ def random_song():
         return response
 
 
-@app.route('/song/<string:song_name>', methods=['DELETE'])
-def delete_song(song_name):
+@app.route('/song/<string:song_info>', methods=['DELETE'])
+def delete_song(song_info):
     """ Delete a song from the DB   """
     try:
-        song_mgr.delete_song(song_name)
+
+        song_mgr.delete_song(song_info)
 
         response = app.response_class(
                 status=200
