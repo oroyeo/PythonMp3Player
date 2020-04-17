@@ -111,11 +111,6 @@ class MainAppController(tk.Frame):
             index = song_listbox.curselection()
             item = song_listbox.get(index)
             self._queue_list.append(item)
-            self._queue.set_songs(self._queue_list)
-            # if len(self._queue.queue_listbox) != 0:
-            #     self._queue.queue_listbox.delete(0, tk.END)
-            # for item in self._queue_list:
-            #     self._queue.queue_listbox.insert(tk.END, item)
 
             messagestr = f'Successfully added {item} to the queue'
             messagebox.showinfo(title='Add Successful', message=messagestr)
@@ -255,7 +250,36 @@ class MainAppController(tk.Frame):
     def play_queue_callback(self):
         """ Starts playing songs in the queue"""
 
-        # item = self._queue.queue_listbox.get(count)
+        try:
+            song_info = self._queue_list[0]
+            self.update_helper(song_info)
+            title = song_info[0]
+            response = requests.get("http://localhost:5000/song/" + song_info)
+
+            # Updates play count and date added
+
+            if self._media_player.get_state() == vlc.State.Playing:
+                self._media_player.stop()
+            media_file = response.json()['path_name']
+
+            media = self._vlc_instance.media_new_path(media_file)
+            self._media_player.set_media(media)
+            self._media_player.play()
+            self._current_title = title
+            self._player._current_song['text'] = song_info
+            self._player._current_state['text'] = 'Playing'
+
+            self._posn = 1
+
+        except:
+            messagebox.showinfo(title='Queue empty',
+                                message=f'Please add songs to queue before trying to play')
+
+        return
+
+    def play_next_callback(self):
+        """ Starts playing songs in the queue"""
+
         try:
             song_info = self._queue_list[self._posn]
             self.update_helper(song_info)
@@ -275,13 +299,13 @@ class MainAppController(tk.Frame):
             self._player._current_song['text'] = song_info
             self._player._current_state['text'] = 'Playing'
 
+            self._posn += 1
 
         except:
-            messagebox.showinfo(title='Queue empty',
-                                message=f'Please add songs to queue before trying to play')
+            messagebox.showinfo(title='Queue finished',
+                                message=f'You\'ve reached the end of your queue')
 
         return
-
 
     def play_callback(self):
         """Play a song specified by number. """
