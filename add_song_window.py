@@ -35,7 +35,6 @@ class AddSongWindow(tk.Frame):
         self.add_student_button.pack()
         self.close_button.pack()
 
-    """" Reformat this to take the attributes from songs """
     def get_form_data(self):
         """ Return a dictionary of form field values for this form """
         song_data = {"path_name": self._url.get()}

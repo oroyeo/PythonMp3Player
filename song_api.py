@@ -99,14 +99,14 @@ def delete_song(song_name):
     return response
 
 
-@app.route('/song/names', methods=['GET'])
-def get_all_names():
-    """ Return a list of all song names    """
-    names = song_mgr.get_all_songs()
+@app.route('/song/songs', methods=['GET'])
+def get_all_songs():
+    """ Return a list of all song id and titles    """
+    songs = song_mgr.get_all_songs()
 
     response = app.response_class(
             status=200,
-            response=json.dumps([s.to_dict() for s in names]),
+            response=json.dumps([s.meta_data() for s in songs]),
             mimetype='application/json'
     )
 
