@@ -13,8 +13,6 @@ class PlayerWindow(tk.Frame):
         """ Initialize Main Application """
         tk.Frame.__init__(self, parent)
 
-
-
         # Window attributes
         parent.title('Audio Player')
         parent.geometry("400x400")
@@ -67,7 +65,7 @@ class PlayerWindow(tk.Frame):
         tk.Button(bot_frame, text="Queue", width=10, command=self.passer_function())\
                 .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Update Song", width=10, command=self.passer_function())\
+        tk.Button(bot_frame, text="Update Song", width=10, command=my_controller.update_song_popup)\
                 .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
 
 
