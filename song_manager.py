@@ -90,8 +90,6 @@ class SongManager:
         split = song_info.split(' - ')
         title = split[0]
         artist = split[1]
-        print(title)
-        print(artist)
 
         session = self._db_session()
 
