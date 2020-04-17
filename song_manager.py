@@ -65,6 +65,23 @@ class SongManager:
         session.commit()
         session.close()
 
+    def update_song_usage(self, song):
+        """ Update existing song to match song_upd """
+        if song is None or not isinstance(song, Song):
+            raise ValueError("Invalid Song Object")
+
+        session = self._db_session()
+
+        existing_song = session.query(Song).filter(
+                Song.id == song.id).first()
+        if existing_song is None:
+            raise ValueError(f"Song {song.id} does not exist")
+
+        existing_song.update_usage(song)
+
+        session.commit()
+        session.close()
+
     def get_song(self, song_info):
         """ Return song object matching ID"""
         if song_info is None or type(song_info) != str:

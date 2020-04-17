@@ -54,6 +54,6 @@ class UpdateSongWindow(tk.Frame):
         song_data = {"rating": int(self._rating.get()),
                      "album": self._album.get(),
                      "genre": self._genre.get()}
-        print(type(song_data['rating']))
+
         return song_data
 

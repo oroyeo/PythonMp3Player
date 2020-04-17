@@ -35,7 +35,10 @@ class PlayerWindow(tk.Frame):
         bot_frame.grid(row=2, padx=30, pady=10)
 
         # Song label
-        tk.Label(top_frame, text='Song List').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(top_frame, text='Now Playing:').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
+        self._current_song = tk.Label(top_frame, text='')
+        self._current_song.grid(row=0, column=1, sticky=tk.W, padx=5, pady=5)
+        tk.Label(top_frame, text='Song List').grid(row=1, column=0, sticky=tk.E, padx=5, pady=5)
 
         # Listbox and scrollbar
         self.song_listbox = tk.Listbox(mid_frame, width=45,
@@ -62,12 +65,17 @@ class PlayerWindow(tk.Frame):
         tk.Button(bot_frame, text="Delete", width=10, command=my_controller.delete_callback)\
                 .grid(row=1, column=1, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Queue", width=10, command=self.passer_function())\
-                .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
-
         tk.Button(bot_frame, text="Update Song", width=10, command=my_controller.update_song_popup)\
                 .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
 
+        tk.Button(bot_frame, text="Song Info", width=10, command=my_controller.song_info_popup)\
+                .grid(row=2, column=0, sticky=tk.E, padx=20, pady=5)
+
+        tk.Button(bot_frame, text="Queue", width=10, command=self.passer_function())\
+                .grid(row=2, column=1, sticky=tk.E, padx=20, pady=5)
+
+        tk.Button(bot_frame, text="View Queue", width=10, command=self.passer_function())\
+                .grid(row=2, column=2, sticky=tk.E, padx=20, pady=5)
 
     def passer_function(self):
         """ Placeholder function"""

@@ -2,7 +2,8 @@ from flask import Flask, request
 from song_manager import SongManager
 from song import Song
 import json
-import random
+from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -38,7 +39,6 @@ def add_song():
 def get_song(song_info):
     """ Get a song from the database """
     try:
-        print(song_info)
         song = song_mgr.get_song(song_info)
         if song is None:
             raise ValueError(f"Song does not exist")
@@ -94,6 +94,7 @@ def update_song(song_info):
     """ Update the song information  """
 
     content = request.json
+
     try:
         song = song_mgr.get_song(song_info)
 
@@ -103,6 +104,28 @@ def update_song(song_info):
             song.album = content['album']
         if 'genre' in content:
             song.genre = content['genre']
+
+
+        song_mgr.update_song(song)
+        response = app.response_class(
+                status=200
+        )
+    except ValueError as e:
+        response = app.response_class(
+                response=str(e),
+                status=400
+        )
+
+    return response
+
+@app.route('/song/usage/<string:song_info>', methods=['PUT'])
+def update_song_usage(song_info):
+    """ Update the song usage stats  """
+
+    try:
+        song = song_mgr.get_song(song_info)
+
+        song.update_usage_stats()
 
         song_mgr.update_song(song)
         response = app.response_class(

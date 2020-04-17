@@ -9,6 +9,7 @@ from add_song_window import AddSongWindow
 import eyed3
 import os
 import vlc
+from song_info_window import SongInfoWindow
 import json
 
 
@@ -57,17 +58,33 @@ class MainAppController(tk.Frame):
 
         self._update_win.destroy()
 
+    def song_info_popup(self):
+        """ Shows entry field popup"""
+
+        song_listbox = self._player.song_listbox
+        item = song_listbox.curselection()
+        index = item[0]
+        song_info = song_listbox.get(index)
+        data = self.info_callback(song_info)
+
+        self._info_win = tk.Toplevel()
+        self._song_stats = SongInfoWindow(self._info_win,
+                                             self._close_song_info_popup,
+                                             song_info, data)
+
+    def _close_song_info_popup(self):
+        """ Close Update popup"""
+        self._info_win.destroy()
+
+
     # Callbacks
-
-
     def update_callback(self):
         """ Updates the song value """
         form_data = self._update_song.get_form_data()
         song_info = self._update_song.song_data
 
-
         response = requests.put("http://localhost:5000/song/" + song_info, json=form_data)
-        print(response)
+
         if response.status_code == 200:
             msg_str = f'{song_info} updated'
             messagebox.showinfo(title='Update Song', message=msg_str)
@@ -79,7 +96,7 @@ class MainAppController(tk.Frame):
         self._update_song._close_cb()
         return
 
-    # 6: define callback functions
+
     def clear_callback(self):
         """ Remove all students names from system. """
         response = requests.delete("http://localhost:5000/song/all")
@@ -143,12 +160,21 @@ class MainAppController(tk.Frame):
             song_listbox.insert(tk.END, song)
 
 
+    def info_callback(self, song_info):
+        """ Generates value for chosen song"""
+        response = requests.get("http://localhost:5000/song/" + song_info)
+
+        return response.json()
+
     def play_callback(self):
         """Play a song specified by number. """
         song_listbox = self._player.song_listbox
         item = song_listbox.curselection()
         index = item[0]
         song_info = song_listbox.get(index)
+
+        # At the moment doesn't work
+        self.update_helper(song_info)
 
         title = song_info[0]
         if title is None:
@@ -158,6 +184,9 @@ class MainAppController(tk.Frame):
             return
 
         response = requests.get("http://localhost:5000/song/" + song_info)
+
+        # Updates play count and date added
+
         if self._media_player.get_state() == vlc.State.Playing:
             self._media_player.stop()
         media_file = response.json()['path_name']
@@ -165,8 +194,26 @@ class MainAppController(tk.Frame):
         self._media_player.set_media(media)
         self._media_player.play()
         self._current_title = title
+        self._player._current_song['text'] = song_info
 
         print(f"Playing {title} from file {media_file}")
+
+        return
+
+    def update_helper(self, song_info):
+        """ Updates play count and date added """
+
+        response = requests.put("http://localhost:5000/song/usage/" + song_info)
+
+        if response.status_code == 200:
+            msg_str = f'{song_info} updated'
+            print(msg_str)
+
+        if response.status_code == 400:
+            msg_str = 'Song update failed'
+            print(msg_str)
+
+        return
 
     def pause_callback(self):
         """ Pause the player """
