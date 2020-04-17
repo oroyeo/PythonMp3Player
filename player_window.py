@@ -49,13 +49,13 @@ class PlayerWindow(tk.Frame):
         self.song_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # Buttons
-        tk.Button(bot_frame, text="Play", width=10, command=self.passer_function())\
+        tk.Button(bot_frame, text="Play", width=10, command=my_controller.play_callback)\
                 .grid(row=0, column=0, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Pause", width=10, command=self.passer_function())\
+        tk.Button(bot_frame, text="Pause", width=10, command=my_controller.pause_callback)\
                 .grid(row=0, column=1, sticky=tk.E, padx=20, pady=5)
 
-        tk.Button(bot_frame, text="Resume", width=10, command=self.passer_function())\
+        tk.Button(bot_frame, text="Resume", width=10, command=my_controller.resume_callback)\
                 .grid(row=0, column=2, sticky=tk.E, padx=20, pady=5)
 
         tk.Button(bot_frame, text="Add", width=10, command=my_controller.add_song_popup)\
@@ -65,6 +65,9 @@ class PlayerWindow(tk.Frame):
                 .grid(row=1, column=1, sticky=tk.E, padx=20, pady=5)
 
         tk.Button(bot_frame, text="Queue", width=10, command=self.passer_function())\
+                .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
+
+        tk.Button(bot_frame, text="Update Song", width=10, command=self.passer_function())\
                 .grid(row=1, column=2, sticky=tk.E, padx=20, pady=5)
 
 
