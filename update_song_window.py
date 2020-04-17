@@ -13,11 +13,11 @@ class UpdateSongWindow(tk.Frame):
 
         # Frames
         self.top_frame = tk.Frame(master=parent)
-        self.top_frame.grid(row=0, padx=30, pady=10)
+        self.top_frame.grid(row=0, padx=10, pady=10)
         self.mid_frame = tk.Frame(master=parent)
-        self.mid_frame.grid(row=1, column=0, padx=30, pady=10)
+        self.mid_frame.grid(row=1, column=0, padx=10, pady=10)
         self.entry_frame = tk.Frame(master=parent)
-        self.entry_frame.grid(row=1, column=1, padx=30, pady=10)
+        self.entry_frame.grid(row=1, column=1, padx=10, pady=10)
         self.bot_frame = tk.Frame(master=parent)
         self.bot_frame.grid(row=2, padx=30, pady=10)
 

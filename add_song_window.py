@@ -3,11 +3,12 @@ import tkinter as tk
 
 class AddSongWindow(tk.Frame):
 
-    def __init__(self, parent, close_callback, add_callback):
+    def __init__(self, parent, close_callback, add_callback, open_callback):
         """ Initialize the popup add student window """
         tk.Frame.__init__(self, parent)
         self._close_cb = close_callback
         self._add_cb = add_callback
+        self._open_cb = open_callback
 
         parent.title('Add Song')
 
@@ -25,19 +26,23 @@ class AddSongWindow(tk.Frame):
         self._url = tk.Entry(self.mid_frame, width=50)
         self._url.grid(row=0, column=1, sticky=tk.E)
 
-        self.add_student_button = tk.Button(self.bot_frame, text="Save", width=10,
+        self.open_song_button = tk.Button(self.bot_frame, text="Open", width=10,
+                                    command=self._open_cb)
+
+        self.add_song_button = tk.Button(self.bot_frame, text="Save", width=10,
                                     command=self._add_cb)
 
 
         self.close_button = tk.Button(self.bot_frame, text='Cancel', width=10,
                                    command=self._close_cb)
 
-        self.add_student_button.pack()
+        self.open_song_button.pack()
+        self.add_song_button.pack()
         self.close_button.pack()
 
     def get_form_data(self):
         """ Return a dictionary of form field values for this form """
-        song_data = {"path_name": self._url.get()}
+        song_data = self._url.get()
 
         return song_data
 

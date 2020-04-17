@@ -22,24 +22,26 @@ class SongInfoWindow(tk.Frame):
         self.bot_frame.grid(row=2, padx=30, pady=10)
 
         # Labels
-        tk.Label(self.top_frame, text='Title:').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.top_frame, text='Song:').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
         self._song_name = tk.Label(self.top_frame, text=self.song_data)
         self._song_name.grid(row=0, column=1, sticky=tk.W, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Artist:').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Album:').grid(row=1, column=0, sticky=tk.E, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Genre:').grid(row=2, column=0, sticky=tk.E, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Rating:').grid(row=3, column=0, sticky=tk.E, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Date Added:').grid(row=4, column=0, sticky=tk.E, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Last Played:').grid(row=5, column=0, sticky=tk.E, padx=5, pady=5)
-        tk.Label(self.mid_frame, text='Play Count:').grid(row=6, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Title:').grid(row=0, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Artist:').grid(row=1, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Album:').grid(row=2, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Genre:').grid(row=3, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Rating:').grid(row=4, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Date Added:').grid(row=5, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Last Played:').grid(row=6, column=0, sticky=tk.E, padx=5, pady=5)
+        tk.Label(self.mid_frame, text='Play Count:').grid(row=7, column=0, sticky=tk.E, padx=5, pady=5)
 
         tk.Label(self.mid_frame, text=data['title']).grid(row=0, column=1, sticky=tk.W, padx=5, pady=5)
         tk.Label(self.mid_frame, text=data['artist']).grid(row=1, column=1, sticky=tk.W, padx=5, pady=5)
         tk.Label(self.mid_frame, text=data['album']).grid(row=2, column=1, sticky=tk.W, padx=5, pady=5)
         tk.Label(self.mid_frame, text=data['genre']).grid(row=3, column=1, sticky=tk.W, padx=5, pady=5)
-        tk.Label(self.mid_frame, text=data['date_added']).grid(row=4, column=1, sticky=tk.W, padx=5, pady=5)
-        tk.Label(self.mid_frame, text=data['last_played']).grid(row=5, column=1, sticky=tk.W, padx=5, pady=5)
-        tk.Label(self.mid_frame, text=data['play_count']).grid(row=6, column=1, sticky=tk.W, padx=5, pady=5)
+        tk.Label(self.mid_frame, text=data['rating']).grid(row=4, column=1, sticky=tk.W, padx=5, pady=5)
+        tk.Label(self.mid_frame, text=data['date_added']).grid(row=5, column=1, sticky=tk.W, padx=5, pady=5)
+        tk.Label(self.mid_frame, text=data['last_played']).grid(row=6, column=1, sticky=tk.W, padx=5, pady=5)
+        tk.Label(self.mid_frame, text=data['play_count']).grid(row=7, column=1, sticky=tk.W, padx=5, pady=5)
 
 
 

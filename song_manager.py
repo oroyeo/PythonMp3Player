@@ -105,7 +105,7 @@ class SongManager:
     def delete_song(self, song_info):
         """ Delete a song from the database """
         if song_info is None or type(song_info) != str:
-            raise ValueError("Invalid Song id")
+            raise ValueError("Invalid Song Information")
 
         split = song_info.split(' - ')
         title = split[0]

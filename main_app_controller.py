@@ -33,7 +33,7 @@ class MainAppController(tk.Frame):
         self._add_win = tk.Toplevel()
         self._add_song = AddSongWindow(self._add_win,
                                              self._close_add_song_popup,
-                                             self.add_callback)
+                                             self.add_callback, self.open_callback)
 
     def _close_add_song_popup(self):
         """ Close Add popup"""
@@ -76,8 +76,30 @@ class MainAppController(tk.Frame):
         """ Close Update popup"""
         self._info_win.destroy()
 
-
     # Callbacks
+    def open_callback(self):
+        """ Load all the names from the file """
+        selected_file = askopenfilename(initialdir='.')
+        if selected_file:
+            self.file_name = os.path.abspath(selected_file)
+            print(self.file_name)
+            song_data = self.load(self.file_name)
+
+            response = requests.post("http://localhost:5000/song", json=song_data)
+            if response.status_code == 200:
+                msg_str = f'{song_data["title"]}, {song_data["artist"]}' \
+                          f' added to the database'
+                messagebox.showinfo(title='Add Song', message=msg_str)
+
+            if response.status_code == 400:
+                msg_str = 'Song already exists'
+                messagebox.showinfo(title='Add Song', message=msg_str)
+
+            self.listbox_callback()
+            self._add_song._close_cb()
+            return
+
+
     def update_callback(self):
         """ Updates the song value """
         form_data = self._update_song.get_form_data()
@@ -94,6 +116,7 @@ class MainAppController(tk.Frame):
             messagebox.showinfo(title='Update Song', message=msg_str)
 
         self._update_song._close_cb()
+
         return
 
 
@@ -115,11 +138,6 @@ class MainAppController(tk.Frame):
         form_data = self._add_song.get_form_data()
         song_data = self.load(form_data)
 
-        if len(form_data) != 1:
-            messagebox.showerror(title='Invalid url data',
-                                 message='Enter "Song URL')
-            return
-
         response = requests.post("http://localhost:5000/song", json=song_data)
         if response.status_code == 200:
             msg_str = f'{song_data["title"]}, {song_data["artist"]}' \
@@ -132,23 +150,31 @@ class MainAppController(tk.Frame):
 
         self.listbox_callback()
         self._add_song._close_cb()
+
         return
 
 
     def delete_callback(self):
         """ Deletes a student from the list and db"""
         song_listbox = self._player.song_listbox
+
         item = song_listbox.curselection()
-        index = item[0]
-        song_info = song_listbox.get(index)
+        try:
+            index = item[0]
+            song_info = song_listbox.get(index)
 
-        response = requests.delete("http://localhost:5000/song/" + song_info)
+            response = requests.delete("http://localhost:5000/song/" + song_info)
 
-        if response.status_code == 200:
-            msg_str = f'{song_info} deleted from the database'
-            messagebox.showinfo(title='Add Student', message=msg_str)
+            if response.status_code == 200:
+                msg_str = f'{song_info} deleted from the database'
+                messagebox.showinfo(title='Add Student', message=msg_str)
 
-        self.listbox_callback()
+            self.listbox_callback()
+
+        except:
+            messagebox.showinfo(title='Error', message='Please choose an item in the list')
+
+
 
     def listbox_callback(self):
         """ Gets a list of all songs and """
@@ -170,33 +196,36 @@ class MainAppController(tk.Frame):
         """Play a song specified by number. """
         song_listbox = self._player.song_listbox
         item = song_listbox.curselection()
-        index = item[0]
-        song_info = song_listbox.get(index)
+        try:
+            index = item[0]
+            song_info = song_listbox.get(index)
 
-        # At the moment doesn't work
-        self.update_helper(song_info)
+            # At the moment doesn't work
+            self.update_helper(song_info)
 
-        title = song_info[0]
-        if title is None:
-            messagebox.showinfo(title="Invalid Choice",
-                    message=f"Invalid song, please us the listbox to select a song from the"\
-                            f"listbox.")
-            return
+            title = song_info[0]
+            if title is None:
+                messagebox.showinfo(title="Invalid Choice",
+                        message=f"Invalid song, please us the listbox to select a song from the"\
+                                f"listbox.")
+                return
 
-        response = requests.get("http://localhost:5000/song/" + song_info)
+            response = requests.get("http://localhost:5000/song/" + song_info)
 
-        # Updates play count and date added
+            # Updates play count and date added
 
-        if self._media_player.get_state() == vlc.State.Playing:
-            self._media_player.stop()
-        media_file = response.json()['path_name']
-        media = self._vlc_instance.media_new_path(media_file)
-        self._media_player.set_media(media)
-        self._media_player.play()
-        self._current_title = title
-        self._player._current_song['text'] = song_info
-
-        print(f"Playing {title} from file {media_file}")
+            if self._media_player.get_state() == vlc.State.Playing:
+                self._media_player.stop()
+            media_file = response.json()['path_name']
+            print(media_file)
+            media = self._vlc_instance.media_new_path(media_file)
+            self._media_player.set_media(media)
+            self._media_player.play()
+            self._current_title = title
+            self._player._current_song['text'] = song_info
+            self._player._current_state['text'] = 'Playing'
+        except:
+            messagebox.showinfo(title='Error', message='Please choose an item in the list')
 
         return
 
@@ -219,19 +248,26 @@ class MainAppController(tk.Frame):
         """ Pause the player """
         if self._media_player.get_state() == vlc.State.Playing:
             self._media_player.pause()
-        print(f"Player paused during playback of {self._current_title}")
+        self._player._current_state['text'] = 'Paused'
 
     def resume_callback(self):
         """ Resume playing """
         if self._media_player.get_state() == vlc.State.Paused:
             self._media_player.pause()
-        print(f"Playback of {self._current_title} resumed")
+        self._player._current_state['text'] = 'Playing'
+
+    def stop_callback(self):
+        """ Stop the player """
+        self._media_player.stop()
+        self._player._current_state['text'] = ''
+        self._player._current_song['text'] = ''
 
     def load(self, song_url):
         """ Loads a song by the url"""
-        split_path = os.path.split(song_url['path_name'])
-        mp3_path = split_path[0]
-        mp3_file = eyed3.load(song_url['path_name'])
+
+        mp3_file = eyed3.load(song_url)
+
+
         runtime = mp3_file.info.time_secs
         mins = int(runtime // 60)
         secs = int(runtime % 60)
@@ -240,16 +276,12 @@ class MainAppController(tk.Frame):
         song_info = { "title": getattr(mp3_file.tag, 'title'),
             "artist": getattr(mp3_file.tag, 'artist'),
             "runtime": runtime,
-            "path_name": song_url['path_name'],
+            "path_name": song_url,
             "album": getattr(mp3_file.tag, 'album'),
             "genre": str(getattr(mp3_file.tag, 'genre'))
                     }
 
         return song_info
-
-
-
-
 
 
 if __name__ == "__main__":
