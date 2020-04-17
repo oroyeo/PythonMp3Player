@@ -4,11 +4,12 @@ from tkinter.filedialog import askopenfilename
 import requests
 from tkinter import messagebox
 from song import Song
-from classlist_window import ClasslistWindow
+from update_song_window import UpdateSongWindow
 from add_song_window import AddSongWindow
 import eyed3
 import os
 import vlc
+import json
 
 
 class MainAppController(tk.Frame):
@@ -23,6 +24,60 @@ class MainAppController(tk.Frame):
 
         self._vlc_instance = vlc.Instance()
         self._media_player = self._vlc_instance.media_player_new()
+
+
+    # Windows
+    def add_song_popup(self):
+        """ Shows entry field popup"""
+        self._add_win = tk.Toplevel()
+        self._add_song = AddSongWindow(self._add_win,
+                                             self._close_add_song_popup,
+                                             self.add_callback)
+
+    def _close_add_song_popup(self):
+        """ Close Add popup"""
+
+        self._add_win.destroy()
+
+    def update_song_popup(self):
+        """ Shows entry field popup"""
+
+        song_listbox = self._player.song_listbox
+        item = song_listbox.curselection()
+        index = item[0]
+        song_info = song_listbox.get(index)
+
+        self._update_win = tk.Toplevel()
+        self._update_song = UpdateSongWindow(self._update_win,
+                                             self._close_update_song_popup,
+                                             self.update_callback, song_info)
+
+    def _close_update_song_popup(self):
+        """ Close Update popup"""
+
+        self._update_win.destroy()
+
+    # Callbacks
+
+
+    def update_callback(self):
+        """ Updates the song value """
+        form_data = self._update_song.get_form_data()
+        song_info = self._update_song.song_data
+
+
+        response = requests.put("http://localhost:5000/song/" + song_info, json=form_data)
+        print(response)
+        if response.status_code == 200:
+            msg_str = f'{song_info} updated'
+            messagebox.showinfo(title='Update Song', message=msg_str)
+
+        if response.status_code == 400:
+            msg_str = 'Song update failed'
+            messagebox.showinfo(title='Update Song', message=msg_str)
+
+        self._update_song._close_cb()
+        return
 
     # 6: define callback functions
     def clear_callback(self):
@@ -62,18 +117,6 @@ class MainAppController(tk.Frame):
         self._add_song._close_cb()
         return
 
-
-    def add_song_popup(self):
-        """ Shows entry field popup"""
-        self._add_win = tk.Toplevel()
-        self._add_song = AddSongWindow(self._add_win,
-                                             self._close_add_song_popup,
-                                             self.add_callback)
-
-    def _close_add_song_popup(self):
-        """ Close Add popup"""
-
-        self._add_win.destroy()
 
     def delete_callback(self):
         """ Deletes a student from the list and db"""
@@ -115,7 +158,6 @@ class MainAppController(tk.Frame):
             return
 
         response = requests.get("http://localhost:5000/song/" + song_info)
-
         if self._media_player.get_state() == vlc.State.Playing:
             self._media_player.stop()
         media_file = response.json()['path_name']
@@ -123,6 +165,7 @@ class MainAppController(tk.Frame):
         self._media_player.set_media(media)
         self._media_player.play()
         self._current_title = title
+
         print(f"Playing {title} from file {media_file}")
 
     def pause_callback(self):
@@ -156,6 +199,8 @@ class MainAppController(tk.Frame):
                     }
 
         return song_info
+
+
 
 
 

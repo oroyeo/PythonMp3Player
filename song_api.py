@@ -89,19 +89,21 @@ def get_all_songs():
     return response
 
 
-@app.route('/song/<string:song_id>', methods=['PUT'])
-def update_song(song_id):
+@app.route('/song/<string:song_info>', methods=['PUT'])
+def update_song(song_info):
     """ Update the song information  """
-    content = request.json
 
+    content = request.json
     try:
-        song = song_mgr.get_song(song_id)
+        song = song_mgr.get_song(song_info)
+
         if 'rating' in content:
             song.rating = content['rating']
         if 'album' in content:
             song.album = content['album']
         if 'genre' in content:
             song.genre = content['genre']
+
         song_mgr.update_song(song)
         response = app.response_class(
                 status=200
