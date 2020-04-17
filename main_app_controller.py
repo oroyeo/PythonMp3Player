@@ -25,7 +25,7 @@ class MainAppController(tk.Frame):
 
         self._vlc_instance = vlc.Instance()
         self._media_player = self._vlc_instance.media_player_new()
-
+        self._posn = 0
         self._queue_list = []
 
 
@@ -106,14 +106,16 @@ class MainAppController(tk.Frame):
         """ Adds item to queue """
         song_listbox = self._player.song_listbox
         # queue_listbox = self._queue.queue_listbox
+
         try:
             index = song_listbox.curselection()
             item = song_listbox.get(index)
             self._queue_list.append(item)
-
-            self._queue.queue_listbox.delete(0, tk.END)
-            for item in self._queue_list:
-                self._queue.queue_listbox.insert(tk.END, item)
+            self._queue.set_songs(self._queue_list)
+            # if len(self._queue.queue_listbox) != 0:
+            #     self._queue.queue_listbox.delete(0, tk.END)
+            # for item in self._queue_list:
+            #     self._queue.queue_listbox.insert(tk.END, item)
 
             messagestr = f'Successfully added {item} to the queue'
             messagebox.showinfo(title='Add Successful', message=messagestr)
@@ -121,6 +123,9 @@ class MainAppController(tk.Frame):
         except:
             messagestr = 'Please select an item in the song listbox'
             messagebox.showinfo(title='Add failed', message=messagestr)
+
+
+        return
 
     def remove_callback(self):
         """ Removes an item from the queue list in the queue window"""
@@ -246,6 +251,37 @@ class MainAppController(tk.Frame):
         response = requests.get("http://localhost:5000/song/" + song_info)
 
         return response.json()
+
+    def play_queue_callback(self):
+        """ Starts playing songs in the queue"""
+
+        # item = self._queue.queue_listbox.get(count)
+        try:
+            song_info = self._queue_list[self._posn]
+            self.update_helper(song_info)
+            title = song_info[0]
+            response = requests.get("http://localhost:5000/song/" + song_info)
+
+            # Updates play count and date added
+
+            if self._media_player.get_state() == vlc.State.Playing:
+                self._media_player.stop()
+            media_file = response.json()['path_name']
+
+            media = self._vlc_instance.media_new_path(media_file)
+            self._media_player.set_media(media)
+            self._media_player.play()
+            self._current_title = title
+            self._player._current_song['text'] = song_info
+            self._player._current_state['text'] = 'Playing'
+
+
+        except:
+            messagebox.showinfo(title='Queue empty',
+                                message=f'Please add songs to queue before trying to play')
+
+        return
+
 
     def play_callback(self):
         """Play a song specified by number. """

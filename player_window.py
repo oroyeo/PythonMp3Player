@@ -82,6 +82,9 @@ class PlayerWindow(tk.Frame):
         tk.Button(bot_frame, text="Add to Queue", width=10, bg='thistle2', fg='black', command=my_controller.add_queue_callback)\
                 .grid(row=2, column=2, sticky=tk.E, padx=20, pady=5)
 
+        tk.Button(bot_frame, text="Play Queue", width=10, bg='thistle2', fg='black', command=my_controller.play_queue_callback)\
+                .grid(row=2, column=1, sticky=tk.E, padx=20, pady=5)
+
         tk.Button(bot_frame, text="View Queue", width=10, bg='thistle1', fg='black', command=my_controller.queue_window_popup)\
                 .grid(row=3, column=2, sticky=tk.E, padx=20, pady=5)
 
