@@ -51,9 +51,15 @@ class UpdateSongWindow(tk.Frame):
 
     def get_form_data(self):
         """ Return a dictionary of form field values for this form """
-        song_data = {"rating": int(self._rating.get()),
-                     "album": self._album.get(),
-                     "genre": self._genre.get()}
+        try:
+            song_data = {"rating": int(self._rating.get()),
+                         "album": self._album.get(),
+                         "genre": self._genre.get()}
+
+        except:
+            song_data = {"rating": self._rating.get(),
+                         "album": self._album.get(),
+                         "genre": self._genre.get()}
 
         return song_data
 
