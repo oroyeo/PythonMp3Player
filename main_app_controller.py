@@ -10,7 +10,7 @@ import eyed3
 import os
 import vlc
 from song_info_window import SongInfoWindow
-import json
+from queue_window import QueueWindow
 
 
 class MainAppController(tk.Frame):
@@ -25,6 +25,8 @@ class MainAppController(tk.Frame):
 
         self._vlc_instance = vlc.Instance()
         self._media_player = self._vlc_instance.media_player_new()
+
+        self._queue_list = []
 
 
     # Windows
@@ -42,16 +44,19 @@ class MainAppController(tk.Frame):
 
     def update_song_popup(self):
         """ Shows entry field popup"""
+        try:
+            song_listbox = self._player.song_listbox
+            item = song_listbox.curselection()
+            index = item[0]
+            song_info = song_listbox.get(index)
 
-        song_listbox = self._player.song_listbox
-        item = song_listbox.curselection()
-        index = item[0]
-        song_info = song_listbox.get(index)
+            self._update_win = tk.Toplevel()
+            self._update_song = UpdateSongWindow(self._update_win,
+                                                 self._close_update_song_popup,
+                                                 self.update_callback, song_info)
+        except:
+            messagebox.showinfo(title='Selection failed', message='Please select a song from the list first')
 
-        self._update_win = tk.Toplevel()
-        self._update_song = UpdateSongWindow(self._update_win,
-                                             self._close_update_song_popup,
-                                             self.update_callback, song_info)
 
     def _close_update_song_popup(self):
         """ Close Update popup"""
@@ -60,29 +65,80 @@ class MainAppController(tk.Frame):
 
     def song_info_popup(self):
         """ Shows entry field popup"""
+        try:
+            song_listbox = self._player.song_listbox
+            item = song_listbox.curselection()
+            index = item[0]
+            song_info = song_listbox.get(index)
+            data = self.info_callback(song_info)
 
-        song_listbox = self._player.song_listbox
-        item = song_listbox.curselection()
-        index = item[0]
-        song_info = song_listbox.get(index)
-        data = self.info_callback(song_info)
+            self._info_win = tk.Toplevel()
+            self._song_stats = SongInfoWindow(self._info_win,
+                                                 self._close_song_info_popup,
+                                                 song_info, data)
 
-        self._info_win = tk.Toplevel()
-        self._song_stats = SongInfoWindow(self._info_win,
-                                             self._close_song_info_popup,
-                                             song_info, data)
+        except:
+            messagebox.showinfo(title='Selection failed', message='Please select a song from the list first')
+
 
     def _close_song_info_popup(self):
         """ Close Update popup"""
         self._info_win.destroy()
 
+    def queue_window_popup(self):
+        """ Shows queue popup"""
+        self._queue_win = tk.Toplevel()
+        self._queue = QueueWindow(self._queue_win,
+                                  self._close_queue_popup,
+                                  self.remove_callback,
+                                  self._queue_list)
+
+        self._queue.set_songs(self._queue_list)
+
+
+    def _close_queue_popup(self):
+        """ Close Update popup"""
+        self._queue_win.destroy()
+
     # Callbacks
+
+    def add_queue_callback(self):
+        """ Adds item to queue """
+        song_listbox = self._player.song_listbox
+        # queue_listbox = self._queue.queue_listbox
+        try:
+            index = song_listbox.curselection()
+            item = song_listbox.get(index)
+            self._queue_list.append(item)
+
+            self._queue.queue_listbox.delete(0, tk.END)
+            for item in self._queue_list:
+                self._queue.queue_listbox.insert(tk.END, item)
+
+            messagestr = f'Successfully added {item} to the queue'
+            messagebox.showinfo(title='Add Successful', message=messagestr)
+
+        except:
+            messagestr = 'Please select an item in the song listbox'
+            messagebox.showinfo(title='Add failed', message=messagestr)
+
+    def remove_callback(self):
+        """ Removes an item from the queue list in the queue window"""
+
+        try:
+            item = self._queue.queue_listbox.curselection()
+            index = item[0]
+            self._queue_list.pop(index)
+            self._queue.set_songs(self._queue_list)
+        except:
+            messagebox.showinfo(title='Error', message='Please choose an item in the list')
+
     def open_callback(self):
         """ Load all the names from the file """
         selected_file = askopenfilename(initialdir='.')
         if selected_file:
             self.file_name = os.path.abspath(selected_file)
-            print(self.file_name)
+
             song_data = self.load(self.file_name)
 
             response = requests.post("http://localhost:5000/song", json=song_data)
@@ -175,7 +231,6 @@ class MainAppController(tk.Frame):
             messagebox.showinfo(title='Error', message='Please choose an item in the list')
 
 
-
     def listbox_callback(self):
         """ Gets a list of all songs and """
         response_names = requests.get("http://localhost:5000/song/songs")
@@ -217,7 +272,7 @@ class MainAppController(tk.Frame):
             if self._media_player.get_state() == vlc.State.Playing:
                 self._media_player.stop()
             media_file = response.json()['path_name']
-            print(media_file)
+
             media = self._vlc_instance.media_new_path(media_file)
             self._media_player.set_media(media)
             self._media_player.play()
@@ -236,11 +291,10 @@ class MainAppController(tk.Frame):
 
         if response.status_code == 200:
             msg_str = f'{song_info} updated'
-            print(msg_str)
+
 
         if response.status_code == 400:
             msg_str = 'Song update failed'
-            print(msg_str)
 
         return
 
