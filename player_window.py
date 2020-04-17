@@ -15,7 +15,7 @@ class PlayerWindow(tk.Frame):
 
         # Window attributes
         parent.title('Audio Player')
-        parent.geometry("400x500")
+        parent.geometry("425x475")
 
         # Menu - WIP
         main_menu = tk.Menu(master=parent)
