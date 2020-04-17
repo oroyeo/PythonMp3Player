@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from base import Base
+from datetime import datetime
 
 from song import Song
 
@@ -66,7 +67,7 @@ class SongManager:
         session.close()
 
     def update_song_usage(self, song):
-        """ Update existing song to match song_upd """
+        """ Update existing song play count and last played """
         if song is None or not isinstance(song, Song):
             raise ValueError("Invalid Song Object")
 
@@ -77,7 +78,9 @@ class SongManager:
         if existing_song is None:
             raise ValueError(f"Song {song.id} does not exist")
 
-        existing_song.update_usage(song)
+        #existing_song.update_usage()
+        existing_song.play_count += 1
+        existing_song.last_played = datetime.now().strftime("%Y-%m-%d")
 
         session.commit()
         session.close()
