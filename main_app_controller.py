@@ -1,12 +1,16 @@
 import tkinter as tk
-from chooser_window import ChooserWindow
+from player_window import PlayerWindow
 from tkinter.filedialog import askopenfilename
 import requests
 from tkinter import messagebox
-from student import Student
-import csv
-from classlist_window import ClasslistWindow
-from add_student_window import AddStudentWindow
+from song import Song
+from update_song_window import UpdateSongWindow
+from add_song_window import AddSongWindow
+import eyed3
+import os
+import vlc
+from song_info_window import SongInfoWindow
+import json
 
 
 class MainAppController(tk.Frame):
@@ -16,128 +20,268 @@ class MainAppController(tk.Frame):
         """ Create the views """
         tk.Frame.__init__(self, parent)
         self._root_win = tk.Toplevel()
-        self._chooser = ChooserWindow(self._root_win, self)
+        self._player = PlayerWindow(self._root_win, self)
+        self.listbox_callback()
 
-    # 6: define callback functions
+        self._vlc_instance = vlc.Instance()
+        self._media_player = self._vlc_instance.media_player_new()
+
+
+    # Windows
+    def add_song_popup(self):
+        """ Shows entry field popup"""
+        self._add_win = tk.Toplevel()
+        self._add_song = AddSongWindow(self._add_win,
+                                             self._close_add_song_popup,
+                                             self.add_callback, self.open_callback)
+
+    def _close_add_song_popup(self):
+        """ Close Add popup"""
+
+        self._add_win.destroy()
+
+    def update_song_popup(self):
+        """ Shows entry field popup"""
+
+        song_listbox = self._player.song_listbox
+        item = song_listbox.curselection()
+        index = item[0]
+        song_info = song_listbox.get(index)
+
+        self._update_win = tk.Toplevel()
+        self._update_song = UpdateSongWindow(self._update_win,
+                                             self._close_update_song_popup,
+                                             self.update_callback, song_info)
+
+    def _close_update_song_popup(self):
+        """ Close Update popup"""
+
+        self._update_win.destroy()
+
+    def song_info_popup(self):
+        """ Shows entry field popup"""
+
+        song_listbox = self._player.song_listbox
+        item = song_listbox.curselection()
+        index = item[0]
+        song_info = song_listbox.get(index)
+        data = self.info_callback(song_info)
+
+        self._info_win = tk.Toplevel()
+        self._song_stats = SongInfoWindow(self._info_win,
+                                             self._close_song_info_popup,
+                                             song_info, data)
+
+    def _close_song_info_popup(self):
+        """ Close Update popup"""
+        self._info_win.destroy()
+
+    # Callbacks
+    def open_callback(self):
+        """ Load all the names from the file """
+        selected_file = askopenfilename(initialdir='.')
+        if selected_file:
+            self.file_name = os.path.abspath(selected_file)
+            print(self.file_name)
+            song_data = self.load(self.file_name)
+
+            response = requests.post("http://localhost:5000/song", json=song_data)
+            if response.status_code == 200:
+                msg_str = f'{song_data["title"]}, {song_data["artist"]}' \
+                          f' added to the database'
+                messagebox.showinfo(title='Add Song', message=msg_str)
+
+            if response.status_code == 400:
+                msg_str = 'Song already exists'
+                messagebox.showinfo(title='Add Song', message=msg_str)
+
+            self.listbox_callback()
+            self._add_song._close_cb()
+            return
+
+
+    def update_callback(self):
+        """ Updates the song value """
+        form_data = self._update_song.get_form_data()
+        song_info = self._update_song.song_data
+
+        response = requests.put("http://localhost:5000/song/" + song_info, json=form_data)
+
+        if response.status_code == 200:
+            msg_str = f'{song_info} updated'
+            messagebox.showinfo(title='Update Song', message=msg_str)
+
+        if response.status_code == 400:
+            msg_str = 'Song update failed'
+            messagebox.showinfo(title='Update Song', message=msg_str)
+
+        self._update_song._close_cb()
+
+        return
+
+
     def clear_callback(self):
         """ Remove all students names from system. """
-        response = requests.delete("http://localhost:5000/student/all")
+        response = requests.delete("http://localhost:5000/song/all")
         if response.status_code == 200:
-            msg_str = f'All names removed from the database'
+            msg_str = f'All songs removed from the database'
             messagebox.showinfo(title='Delete All', message=msg_str)
         else:
-            messagebox.showerror(title='Delete All', message="Something wentwrong")
+            messagebox.showerror(title='Delete All', message="Something went wrong")
 
     def quit_callback(self):
         """ Exit the application. """
         self.master.quit()
 
-    def rand_callback(self):
-     """ Random select a name and display on GUI. """
-     response = requests.get("http://localhost:5000/student/random")
-     student = Student.from_dict(response.json())
-     if response.status_code == 200:
-        full_name = f"{student.first_name} {student.last_name}"
-        self._chooser.display_student_name(full_name)
-     elif response.status_code == 404:
-        messagebox.showinfo(title='Random', message="No names in DB")
-
     def add_callback(self):
         """ Add a new student name to the file. """
-        form_data = self._add_student.get_form_data()
+        form_data = self._add_song.get_form_data()
+        song_data = self.load(form_data)
 
-        if len(form_data) != 3:
-            messagebox.showerror(title='Invalid name data',
-                                 message='Enter "id,first,last')
-            return
-
-        data = form_data
-
-        response = requests.post("http://localhost:5000/student", json=data)
+        response = requests.post("http://localhost:5000/song", json=song_data)
         if response.status_code == 200:
-            msg_str = f'{form_data["student_id"]} {form_data["first_name"]} {form_data["last_name"]}' \
+            msg_str = f'{song_data["title"]}, {song_data["artist"]}' \
                       f' added to the database'
-            messagebox.showinfo(title='Add Student', message=msg_str)
+            messagebox.showinfo(title='Add Song', message=msg_str)
 
-        response_names = requests.get("http://localhost:5000/student/names")
-        name_list = [f'{s["first_name"]} {s["last_name"]}' for s in response_names.json()]
-        self._class.set_names(name_list)
-        self._add_student._close_cb()
+        if response.status_code == 400:
+            msg_str = 'Song already exists'
+            messagebox.showinfo(title='Add Song', message=msg_str)
+
+        self.listbox_callback()
+        self._add_song._close_cb()
+
         return
 
-    def openfile(self):
-        """ Load all the names from the file """
-        selected_file = askopenfilename(initialdir='.')
-        if selected_file:
-            self.file_name = selected_file
-            num_added = 0
-            not_added = []
-            with open(self.file_name, 'r') as csvfile:
-                csv_reader = csv.reader(csvfile, delimiter=',')
-                for row in csv_reader:
-                    data = {'student_id': row[0],
-                            'first_name': row[1],
-                            'last_name': row[2]}
-                    response = requests.post("http://localhost:5000/student",
-                                 json=data)
-                    if response.status_code == 200:
-                        num_added += 1
-                    else:
-                        not_added.append(' '.join(row))
-            msg = f'{num_added} names added to DB.'
-            if len(not_added) > 0:
-                not_added = '\n'.join(not_added)
-                msg += '\n' + f'The following names were not added:'
-                msg += '\n' + not_added
-            messagebox.showinfo(title='Load Names', message=msg)
-
-
-    def classlist_popup(self):
-        """ Show Classlist Popup Window """
-        self._class_win = tk.Toplevel()
-        self._class = ClasslistWindow(self._class_win, self._close_classlist_popup, self.delete_callback, self)
-        response = requests.get("http://localhost:5000/student/names")
-
-        name_list = [f'{s["first_name"]} {s["last_name"]}' for s in response.json()]
-        self._class.set_names(name_list)
-
-
-    def _close_classlist_popup(self):
-        """ Close Classlist Popup """
-
-        self._class_win.destroy()
-
-
-    def add_student_popup(self):
-        """ Shows entry field popup"""
-        self._add_win = tk.Toplevel()
-        self._add_student = AddStudentWindow(self._add_win,
-                                             self._close_add_student_popup,
-                                             self.add_callback)
-
-    def _close_add_student_popup(self):
-        """ Close Add popup"""
-
-        self._add_win.destroy()
 
     def delete_callback(self):
         """ Deletes a student from the list and db"""
-        student_listbox = self._class.name_listbox
-        item = student_listbox.curselection()
-        index = item[0]
+        song_listbox = self._player.song_listbox
 
-        student_name = self._class.name_listbox.get(index)
+        item = song_listbox.curselection()
+        try:
+            index = item[0]
+            song_info = song_listbox.get(index)
 
-        response = requests.delete("http://localhost:5000/student/" + student_name)
+            response = requests.delete("http://localhost:5000/song/" + song_info)
+
+            if response.status_code == 200:
+                msg_str = f'{song_info} deleted from the database'
+                messagebox.showinfo(title='Add Student', message=msg_str)
+
+            self.listbox_callback()
+
+        except:
+            messagebox.showinfo(title='Error', message='Please choose an item in the list')
+
+
+
+    def listbox_callback(self):
+        """ Gets a list of all songs and """
+        response_names = requests.get("http://localhost:5000/song/songs")
+        song_list = [f'{s["title"]} - {s["artist"]}' for s in response_names.json()]
+        song_listbox = self._player.song_listbox
+        song_listbox.delete(0, tk.END)
+        for song in song_list:
+            song_listbox.insert(tk.END, song)
+
+
+    def info_callback(self, song_info):
+        """ Generates value for chosen song"""
+        response = requests.get("http://localhost:5000/song/" + song_info)
+
+        return response.json()
+
+    def play_callback(self):
+        """Play a song specified by number. """
+        song_listbox = self._player.song_listbox
+        item = song_listbox.curselection()
+        try:
+            index = item[0]
+            song_info = song_listbox.get(index)
+
+            # At the moment doesn't work
+            self.update_helper(song_info)
+
+            title = song_info[0]
+            if title is None:
+                messagebox.showinfo(title="Invalid Choice",
+                        message=f"Invalid song, please us the listbox to select a song from the"\
+                                f"listbox.")
+                return
+
+            response = requests.get("http://localhost:5000/song/" + song_info)
+
+            # Updates play count and date added
+
+            if self._media_player.get_state() == vlc.State.Playing:
+                self._media_player.stop()
+            media_file = response.json()['path_name']
+            print(media_file)
+            media = self._vlc_instance.media_new_path(media_file)
+            self._media_player.set_media(media)
+            self._media_player.play()
+            self._current_title = title
+            self._player._current_song['text'] = song_info
+            self._player._current_state['text'] = 'Playing'
+        except:
+            messagebox.showinfo(title='Error', message='Please choose an item in the list')
+
+        return
+
+    def update_helper(self, song_info):
+        """ Updates play count and date added """
+
+        response = requests.put("http://localhost:5000/song/usage/" + song_info)
 
         if response.status_code == 200:
-            msg_str = f'{student_name} deleted from the database'
-            messagebox.showinfo(title='Add Student', message=msg_str)
+            msg_str = f'{song_info} updated'
+            print(msg_str)
 
-        response_names = requests.get("http://localhost:5000/student/names")
-        name_list = [f'{s["first_name"]} {s["last_name"]}' for s in response_names.json()]
-        self._class.set_names(name_list)
+        if response.status_code == 400:
+            msg_str = 'Song update failed'
+            print(msg_str)
 
+        return
+
+    def pause_callback(self):
+        """ Pause the player """
+        if self._media_player.get_state() == vlc.State.Playing:
+            self._media_player.pause()
+        self._player._current_state['text'] = 'Paused'
+
+    def resume_callback(self):
+        """ Resume playing """
+        if self._media_player.get_state() == vlc.State.Paused:
+            self._media_player.pause()
+        self._player._current_state['text'] = 'Playing'
+
+    def stop_callback(self):
+        """ Stop the player """
+        self._media_player.stop()
+        self._player._current_state['text'] = ''
+        self._player._current_song['text'] = ''
+
+    def load(self, song_url):
+        """ Loads a song by the url"""
+
+        mp3_file = eyed3.load(song_url)
+
+
+        runtime = mp3_file.info.time_secs
+        mins = int(runtime // 60)
+        secs = int(runtime % 60)
+        runtime = ('{}:{}'.format(mins, secs))
+
+        song_info = { "title": getattr(mp3_file.tag, 'title'),
+            "artist": getattr(mp3_file.tag, 'artist'),
+            "runtime": runtime,
+            "path_name": song_url,
+            "album": getattr(mp3_file.tag, 'album'),
+            "genre": str(getattr(mp3_file.tag, 'genre'))
+                    }
+
+        return song_info
 
 
 if __name__ == "__main__":

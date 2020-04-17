@@ -3,3 +3,6 @@
 .__pycache__/
 *.mp3
 *.pyc
+*.sqlite
+song_db.sqlite
+song_db.sqlite
