@@ -119,12 +119,11 @@ def update_song(song_info):
     return response
 
 @app.route('/song/usage/<string:song_info>', methods=['PUT'])
-def update_song_usage(song_info):
+def update_usage(song_info):
     """ Update the song usage stats  """
 
     try:
         song = song_mgr.get_song(song_info)
-
         song.update_usage_stats()
 
         song_mgr.update_song(song)
