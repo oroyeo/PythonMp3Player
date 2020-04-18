@@ -64,7 +64,8 @@ class SongManager:
         session.close()
 
     def update_song_usage(self, song):
-        """ Update existing song to play count and last played """
+        """ Update existing song play count and last played """
+
         if song is None or not isinstance(song, Song):
             raise ValueError("Invalid Song Object")
 
