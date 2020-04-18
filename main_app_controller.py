@@ -188,9 +188,11 @@ class MainAppController(tk.Frame):
         else:
             messagebox.showerror(title='Delete All', message="Something went wrong")
 
+
     def quit_callback(self):
         """ Exit the application. """
         self.master.quit()
+
 
     def add_callback(self):
         """ Add a new student name to the file. """
@@ -250,6 +252,7 @@ class MainAppController(tk.Frame):
 
         return response.json()
 
+
     def play_queue_callback(self):
         """ Starts playing songs in the queue"""
 
@@ -280,6 +283,7 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def play_next_callback(self):
         """ Starts playing songs in the queue"""
 
@@ -309,6 +313,7 @@ class MainAppController(tk.Frame):
                                 message=f'You\'ve reached the end of your queue')
 
         return
+
 
     def play_callback(self):
         """Play a song specified by number. """
@@ -347,6 +352,7 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def update_helper(self, song_info):
         """ Updates play count and date added """
 
@@ -361,11 +367,13 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def pause_callback(self):
         """ Pause the player """
         if self._media_player.get_state() == vlc.State.Playing:
             self._media_player.pause()
         self._player._current_state['text'] = 'Paused'
+
 
     def resume_callback(self):
         """ Resume playing """
@@ -373,11 +381,13 @@ class MainAppController(tk.Frame):
             self._media_player.pause()
         self._player._current_state['text'] = 'Playing'
 
+
     def stop_callback(self):
         """ Stop the player """
         self._media_player.stop()
         self._player._current_state['text'] = ''
         self._player._current_song['text'] = ''
+
 
     def load(self, song_url):
         """ Loads a song by the url"""
