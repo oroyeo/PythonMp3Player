@@ -182,12 +182,17 @@ class MainAppController(tk.Frame):
         if response.status_code == 200:
             msg_str = f'All songs removed from the database'
             messagebox.showinfo(title='Delete All', message=msg_str)
+            self._player._current_song['text'] = ''
+            self._player._current_state['text'] = ''
+            self._player.song_listbox.delete(0, tk.END)
         else:
             messagebox.showerror(title='Delete All', message="Something went wrong")
+
 
     def quit_callback(self):
         """ Exit the application. """
         self.master.quit()
+
 
     def add_callback(self):
         """ Add a new student name to the file. """
@@ -247,6 +252,7 @@ class MainAppController(tk.Frame):
 
         return response.json()
 
+
     def play_queue_callback(self):
         """ Starts playing songs in the queue"""
 
@@ -255,8 +261,6 @@ class MainAppController(tk.Frame):
             self.update_helper(song_info)
             title = song_info[0]
             response = requests.get("http://localhost:5000/song/" + song_info)
-
-            # Updates play count and date added
 
             if self._media_player.get_state() == vlc.State.Playing:
                 self._media_player.stop()
@@ -277,6 +281,7 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def play_next_callback(self):
         """ Starts playing songs in the queue"""
 
@@ -285,8 +290,6 @@ class MainAppController(tk.Frame):
             self.update_helper(song_info)
             title = song_info[0]
             response = requests.get("http://localhost:5000/song/" + song_info)
-
-            # Updates play count and date added
 
             if self._media_player.get_state() == vlc.State.Playing:
                 self._media_player.stop()
@@ -307,6 +310,7 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def play_callback(self):
         """Play a song specified by number. """
         song_listbox = self._player.song_listbox
@@ -314,8 +318,6 @@ class MainAppController(tk.Frame):
         try:
             index = item[0]
             song_info = song_listbox.get(index)
-
-            # At the moment doesn't work
             self.update_helper(song_info)
 
             title = song_info[0]
@@ -344,6 +346,7 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def update_helper(self, song_info):
         """ Updates play count and date added """
 
@@ -358,11 +361,13 @@ class MainAppController(tk.Frame):
 
         return
 
+
     def pause_callback(self):
         """ Pause the player """
         if self._media_player.get_state() == vlc.State.Playing:
             self._media_player.pause()
         self._player._current_state['text'] = 'Paused'
+
 
     def resume_callback(self):
         """ Resume playing """
@@ -370,11 +375,13 @@ class MainAppController(tk.Frame):
             self._media_player.pause()
         self._player._current_state['text'] = 'Playing'
 
+
     def stop_callback(self):
         """ Stop the player """
         self._media_player.stop()
         self._player._current_state['text'] = ''
         self._player._current_song['text'] = ''
+
 
     def load(self, song_url):
         """ Loads a song by the url"""
