@@ -262,8 +262,6 @@ class MainAppController(tk.Frame):
             title = song_info[0]
             response = requests.get("http://localhost:5000/song/" + song_info)
 
-            # Updates play count and date added
-
             if self._media_player.get_state() == vlc.State.Playing:
                 self._media_player.stop()
             media_file = response.json()['path_name']
@@ -293,8 +291,6 @@ class MainAppController(tk.Frame):
             title = song_info[0]
             response = requests.get("http://localhost:5000/song/" + song_info)
 
-            # Updates play count and date added
-
             if self._media_player.get_state() == vlc.State.Playing:
                 self._media_player.stop()
             media_file = response.json()['path_name']
@@ -322,8 +318,6 @@ class MainAppController(tk.Frame):
         try:
             index = item[0]
             song_info = song_listbox.get(index)
-
-            # At the moment doesn't work
             self.update_helper(song_info)
 
             title = song_info[0]
