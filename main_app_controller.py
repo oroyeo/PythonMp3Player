@@ -182,6 +182,9 @@ class MainAppController(tk.Frame):
         if response.status_code == 200:
             msg_str = f'All songs removed from the database'
             messagebox.showinfo(title='Delete All', message=msg_str)
+            self._player._current_song['text'] = ''
+            self._player._current_state['text'] = ''
+            self._player.song_listbox.delete(0, tk.END)
         else:
             messagebox.showerror(title='Delete All', message="Something went wrong")
 

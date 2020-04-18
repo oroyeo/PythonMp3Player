@@ -125,7 +125,7 @@ def update_usage(song_info):
     try:
         song = song_mgr.get_song(song_info)
         song_mgr.update_song_usage(song)
-        song_mgr.update_song(song)
+
         response = app.response_class(
                 status=200
         )
