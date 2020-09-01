@@ -40,7 +40,7 @@ pip install python-vlc
 
 ## How to Use
 
-Run both song_api.py and main_app_controller.py
+Run both `song_api.py` and `main_app_controller.py`.
 
 **_Note_**
 
