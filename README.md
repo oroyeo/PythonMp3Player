@@ -1,6 +1,6 @@
 # MovieReviews
 ## Description
-An Mp3 player that allows all basic functionalities such as:
+An Mp3 player inspired by the Super Nintendo that allows all basic functionalities such as:
 - Add
 - Delete
 - Play/Pause/Resume/Stop
