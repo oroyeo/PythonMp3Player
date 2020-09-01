@@ -1,0 +1,5 @@
+eyed3
+sqlalchemy
+flask
+python-vlc
+requests
