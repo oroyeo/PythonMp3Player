@@ -1,5 +1,47 @@
-# Python Mp3 Player
+# MovieReviews
 ## Description
-This is an mp3 player built using Python and Tkinter GUI that allows the base functionalities of a common Mp3 player.
+An Mp3 player that allows all basic functionalities such as:
+- Add
+- Delete
+- Play/Pause/Resume/Stop
+- Queues (Add/Remove)
 
-This program was created for ACIT - 2515 Object Oriented Programming.
+![Alt text](./gui.png?raw=true "Mp3 Player GUI")
+
+## Technologies Used
+
+**Built Using:**
+- Python
+- SqlAlchemy
+- Flask
+- Sqlite
+- python-vlc
+
+
+## Installation
+
+You must have a VLC player installed already.
+
+Installation instructions are for Python 3.
+
+**Dependencies**
+
+Install modules via `pip install -r requirements.txt`.
+
+Or individually: 
+
+```
+pip install sqlalchemy
+pip install flask
+pip install requests
+pip install eyed3
+pip install python-vlc
+```
+
+## How to Use
+
+Run both song_api.py and main_app_controller.py
+
+**_Note_**
+
+Tracks must have their **Artist** and **Title** details filled out for you to add songs to the mp3 player.
